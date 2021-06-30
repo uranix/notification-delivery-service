@@ -5,6 +5,8 @@ services:
     stop_signal: SIGINT
   prometheus-server:
     container_name: prometheus-server
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
     image: prom/prometheus
   grafana:
     container_name: grafana
