@@ -8,7 +8,7 @@ from flask.json import jsonify
 from sender import SendQueue, SenderThread
 
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s [%(levelname)5s] %(message)s')
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s [%(levelname)8s] %(message)s')
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
