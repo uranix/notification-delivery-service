@@ -1,0 +1,13 @@
+services:
+  app:
+    container_name: app
+    build: .
+    stop_signal: SIGINT
+  prometheus-server:
+    container_name: prometheus-server
+    image: prom/prometheus
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
