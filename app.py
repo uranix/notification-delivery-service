@@ -8,7 +8,7 @@ from flask.json import jsonify
 from sender import SendQueue, SenderThread
 
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)5s %(message)s')
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s [%(levelname)5s] %(message)s')
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
@@ -74,6 +74,6 @@ def send():
         compiled = filter['compiled']
         if compiled.matches() is not None:
             return jsonify({'message': 'forbidden by filter id=' + str(id)}), 400
-    if not send_queue.accept(time.time(), body):
+    if not send_queue.accept(time.monotonic(), body):
         return jsonify({'message': 'the queue is full'}), 429
     return jsonify({}), 202
