@@ -15,7 +15,7 @@ class Message:
         self.queued_at = queued_at
         self.attempt = attempt
 
-    def make_next_attempt(self, delay=5):
+    def make_next_attempt(self, delay):
         send_at = time.time() + delay  # schedule send at now + delay sec
         return Message(self.body, send_at, self.queued_at, self.attempt + 1)
 
@@ -91,7 +91,8 @@ class SenderThread(threading.Thread):
                 logger.info('Sent %s', item)
             else:
                 # Send failed, schedule retry
-                item = item.make_next_attempt()
+                delay = 0.75 + 0.5 * random.random()
+                item = item.make_next_attempt(delay)
                 self.queue.put(item)
                 logging.info('Postponed message %s', item)
         except Exception as e:
