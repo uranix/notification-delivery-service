@@ -5,6 +5,8 @@ import time
 from flask import Flask, request, abort
 from flask.json import jsonify
 
+from prometheus_client import REGISTRY
+
 from prometheus_flask_exporter import PrometheusMetrics
 
 from sender import SendQueue, SenderThread
@@ -14,10 +16,11 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s [%(levelname)8s] %(
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-metrics = PrometheusMetrics(app)
+registry = REGISTRY  # Use the default registry with process metrics
+metrics = PrometheusMetrics(app, registry=registry)
 
 send_queue = SendQueue(maxsize=300)
-SenderThread(send_queue).start()
+SenderThread(send_queue, registry=registry).start()
 
 filters = {}
 filter_id = 0
