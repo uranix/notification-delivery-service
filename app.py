@@ -2,8 +2,12 @@ import logging
 import re
 import time
 
-from flask import Flask, request
+from flask import Flask, request, abort
 from flask.json import jsonify
+
+from prometheus_client import REGISTRY
+
+from prometheus_flask_exporter import PrometheusMetrics
 
 from sender import SendQueue, SenderThread
 
@@ -12,8 +16,11 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s [%(levelname)8s] %(
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+registry = REGISTRY  # Use the default registry with process metrics
+metrics = PrometheusMetrics(app, registry=registry)
+
 send_queue = SendQueue(maxsize=300)
-SenderThread(send_queue).start()
+SenderThread(send_queue, registry=registry).start()
 
 filters = {}
 filter_id = 0
@@ -77,3 +84,10 @@ def send():
     if not send_queue.accept(time.monotonic(), body):
         return jsonify({'message': 'the queue is full'}), 429
     return jsonify({}), 202
+
+# Don't collect metrics for unknown endpoints
+# https://github.com/rycus86/prometheus_flask_exporter/issues/94
+def not_found(path):
+    abort(404)
+
+app.route("/<path:path>")(PrometheusMetrics.do_not_track()(not_found))
