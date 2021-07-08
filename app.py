@@ -25,19 +25,22 @@ SenderThread(send_queue, registry=registry).start()
 filters = {}
 filter_id = 0
 
+
 def to_model(filter):
     return {
         'id': filter['id'],
         'pattern': filter['pattern'],
     }
 
+
 @app.route("/filters", methods=['GET'])
 def list_filters():
     return jsonify([to_model(filter) for filter in filters.values()])
 
+
 @app.route("/filters", methods=['POST'])
 def add_filter():
-    if not request.json or not 'pattern' in request.json:
+    if not request.json or 'pattern' not in request.json:
         return jsonify({'message': 'field "pattern" is missing from json request'}), 400
     pattern = request.json['pattern']
     try:
@@ -55,12 +58,14 @@ def add_filter():
     }
     return jsonify(to_model(filters[filter_id]))
 
+
 @app.route("/filters/<int:filter_id>", methods=['GET'])
 def get_filter(filter_id):
     filter = filters.get(filter_id)
     if filter is None:
         return jsonify({'message': 'no filter with id=' + str(filter_id)}), 404
     return jsonify(to_model(filters[filter_id]))
+
 
 @app.route("/filters/<int:filter_id>", methods=['DELETE'])
 def del_filter(filter_id):
@@ -71,9 +76,10 @@ def del_filter(filter_id):
     del filters[filter_id]
     return jsonify(to_model(filter)), 204
 
+
 @app.route("/send", methods=["POST"])
 def send():
-    if not request.json or not 'body' in request.json:
+    if not request.json or 'body' not in request.json:
         return jsonify({'message': 'field "body" is missing from json request'}), 400
     body = request.json['body']
     for filter in filters.values():
@@ -85,9 +91,11 @@ def send():
         return jsonify({'message': 'the queue is full'}), 429
     return jsonify({}), 202
 
+
 # Don't collect metrics for unknown endpoints
 # https://github.com/rycus86/prometheus_flask_exporter/issues/94
 def not_found(path):
     abort(404)
+
 
 app.route("/<path:path>")(PrometheusMetrics.do_not_track()(not_found))

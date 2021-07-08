@@ -87,9 +87,9 @@ class SenderThread(threading.Thread):
         self.send_time_histogram = Histogram('sender_send_time_seconds', 'Message sending time', registry=registry)
         self.lag_histogram = Histogram('sender_lag_seconds', 'Sent message lag', registry=registry,
                                        buckets=(0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, float('inf')))
-        self.attempt_histogram = Histogram('sender_failed_attempts', 'Failed attempts taken before successful send', registry=registry,
+        self.attempt_histogram = Histogram('sender_failed_attempts', 'Failed attempts taken before successful send',
+                                           registry=registry,
                                            buckets=(0, 1, 2, 3, 4, 5, 7, 10, 15, 20, 30, 50, 70, 100, float('inf')))
-
 
     def run(self):
         while True:
