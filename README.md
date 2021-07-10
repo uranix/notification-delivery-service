@@ -4,6 +4,7 @@ A toy service to play with prometheus metrics
 
 ## Run
 ```bash
+$ docker-compose build
 $ docker-compose up
 ```
 
