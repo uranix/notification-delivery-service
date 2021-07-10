@@ -85,7 +85,7 @@ def send():
     for filter in filters.values():
         id = filter['id']
         compiled = filter['compiled']
-        if compiled.matches() is not None:
+        if compiled.match(body) is not None:
             return jsonify({'message': 'forbidden by filter id=' + str(id)}), 400
     if not send_queue.accept(time.monotonic(), body):
         return jsonify({'message': 'the queue is full'}), 429
